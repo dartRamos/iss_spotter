@@ -17,6 +17,7 @@ const fetchMyIP = function(callback) {
       return;
     }
 
+    // Check if the response status code is not 200 (OK)
     if (response.statusCode !== 200) {
       const msg = `Status Code ${response.statusCode} when fetching IP.`;
       callback(Error(msg), null);
@@ -30,7 +31,6 @@ const fetchMyIP = function(callback) {
 
 const fetchCoordsByIP = function(ip, callback) {
   const url = `https://ipwho.is/${ip}`; // Construct the URL with the provided IP
-  console.log(`This is IP: ${url}`)
 
   // Make the API request
   needle.get(url, (error, response, body) => {
@@ -55,4 +55,31 @@ const fetchCoordsByIP = function(ip, callback) {
 };
 
 
-module.exports = { fetchMyIP, fetchCoordsByIP };
+const fetchISSFlyOverTimes = function(coords, callback) {
+  const url =  `https://iss-flyover.herokuapp.com/json/?lat=${coords.latitude}&lon=${coords.longitude}`;
+  
+  // Make the API request
+  needle.get(url, (error, response, body) => {
+    // Check if there was an error with the request
+    if (error) {
+      callback(error, null);
+      return;
+    }
+
+    // Check if the response status code is not 200 (OK)
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching ISS flyover times.`;
+      callback(Error(msg), null);
+      return;
+    }
+
+    // Extract the array of upcoming flyover times from the API response
+    const passes = body.response;
+
+    // Call the callback function with no error and the extracted flyover times
+    callback(null, passes);
+  })
+};
+
+
+module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes };
