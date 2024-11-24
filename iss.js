@@ -43,7 +43,7 @@ const fetchCoordsByIP = function(ip, callback) {
 
     // Check if the API response indicates success
     if (!body.success) {
-      const message = `Success status was ${parsedBody.success}. Server message says: ${parsedBody.message} when fetching for IP ${parsedBody.ip}`;
+      const message = `Success status was ${body.success}. Server message says: ${body.message} when fetching for IP ${body.ip}`;
       callback(Error(message), null);
       return;
     }
