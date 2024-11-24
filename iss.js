@@ -1,6 +1,7 @@
 const needle = require(`needle`);
 
 const url = 'https://api.ipify.org?format=json';
+
 /**
  * Makes a single API request to retrieve the user's IP address.
  * Input:
@@ -27,4 +28,31 @@ const fetchMyIP = function(callback) {
   });
 };
 
-module.exports = { fetchMyIP };
+const fetchCoordsByIP = function(ip, callback) {
+  const url = `https://ipwho.is/${ip}`; // Construct the URL with the provided IP
+  console.log(`This is IP: ${url}`)
+
+  // Make the API request
+  needle.get(url, (error, response, body) => {
+    // Check if there was an error with the request
+    if (error) {
+      callback(error, null);
+      return;
+    }
+
+
+    // Check if the API response indicates success
+    if (!body.success) {
+      const message = `Success status was ${parsedBody.success}. Server message says: ${parsedBody.message} when fetching for IP ${parsedBody.ip}`;
+      callback(Error(message), null);
+      return;
+    }
+
+    const latitude = body.latitude
+    const longitude = body.longitude
+    callback(null, { latitude, longitude }); // Pass the data back via callback
+  });
+};
+
+
+module.exports = { fetchMyIP, fetchCoordsByIP };
