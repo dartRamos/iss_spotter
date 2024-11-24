@@ -11,7 +11,7 @@ const url = 'https://api.ipify.org?format=json';
  *   - The IP address as a string (null if error). Example: "162.245.144.188"
  */
 const fetchMyIP = function(callback) {
-  needle.get(url, (error, response) => {
+  needle.get(url, (error, response, body) => {
     if (error) {
       callback(error, null);
       return;
@@ -19,12 +19,12 @@ const fetchMyIP = function(callback) {
 
     // Check if the response status code is not 200 (OK)
     if (response.statusCode !== 200) {
-      const msg = `Status Code ${response.statusCode} when fetching IP.`;
+      const msg = `Status Code ${response.statusCode} when fetching IP: ${body}`;
       callback(Error(msg), null);
       return;
     }
 
-    const ip = response.body.ip; // Access the IP address
+    const ip = body.ip; // Access the IP address
     callback(null, ip); // Return IP via callback
   });
 };
@@ -81,5 +81,28 @@ const fetchISSFlyOverTimes = function(coords, callback) {
   })
 };
 
+const nextISSTimesForMyLocation = function(callback) {
+  fetchMyIP((error, ip) => {
+    if (error) {
+      return callback(error, null);
+    }
 
-module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes };
+    fetchCoordsByIP(ip, (error, location) => {
+      if (error) {
+        return callback(error, null);
+      }
+
+      fetchISSFlyOverTimes(location, (error, nextPasses) => {
+        if (error) {
+          return callback(error, null);
+        }
+
+        callback(null, nextPasses);
+      });
+    });
+  });
+  
+};
+
+
+module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes, nextISSTimesForMyLocation };
